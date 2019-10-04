@@ -14,9 +14,9 @@ export const MemberCollectionComponent = (props: Props) => {
     <>
       <button onClick={loadMemberCollection}>Load</button>
       <ul>
-        {memberCollection.map(member => 
+        {memberCollection.map(member => (
           <li>{member.login}</li>
-        }
+        ))}
       </ul>
     </>
   );
