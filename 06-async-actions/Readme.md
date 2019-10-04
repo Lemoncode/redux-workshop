@@ -28,11 +28,29 @@ npm install axios --save
 
 - Let's register Redux-thunk middleware in the main index file.
 
-```diff
+\_\_./src/index.tsx
 
+```diff
+- import { createStore } from "redux";
++ import { createStore, applyMiddleware, compose  } from "redux";
++ import reduxThunk from 'redux-thunk';
+
+
+- const store = createStore(reducers,
+-  window['__REDUX_DEVTOOLS_EXTENSION__']
+-  && window['__REDUX_DEVTOOLS_EXTENSION__']()
+-  );
+
++ const composeEnhancers = window['__REDUX_DEVTOOLS_EXTENSION_COMPOSE__'] || compose;
++
++const store = createStore(reducers, /* preloadedState, */ composeEnhancers(
++   applyMiddleware(reduxThunk)
++ ));
 ```
 
 - Let's create a member entity.
+
+_./src/model/member.entity.ts_
 
 ```typescript
 export interface MemberEntity {
@@ -50,8 +68,10 @@ export const createDefaultMemberEntity = () => ({
 
 - Let's create an api to get a list of members from Github:
 
+_./src/api/member.api.ts_
+
 ```typescript
-import { MemberEntity } from "../model/member";
+import { MemberEntity } from "../model/member.entity";
 import Axios, { AxiosResponse } from "axios";
 
 const gitHubURL = "https://api.github.com";
@@ -94,15 +114,15 @@ export const actionsIds = {
 - Let's create an action that will inform the list of members
   to the reducer once the ajax call has been completed.
 
-_./action_
+_./action/index.ts_
 
 ```typescript
-import { actionsEnums } from "../common/actionsEnums";
-import { MemberEntity } from "../model/member";
+import { actionsIds } from "../common/actionIds";
+import { MemberEntity } from "../model/member.entity";
 
 export const memberRequestCompleted = (members: MemberEntity[]) => {
   return {
-    type: actionsEnums.MEMBER_REQUEST_COMPLETED,
+    type: actionsIds.MEMBER_REQUEST_COMPLETED,
     payload: members
   };
 };
@@ -110,10 +130,12 @@ export const memberRequestCompleted = (members: MemberEntity[]) => {
 
 - Now le't s add the thunk action (request start):
 
+_./action/index.ts_
+
 ```diff
 import {actionsEnums} from '../common/actionsEnums';
 import {MemberEntity} from '../model/member';
-+ import {getMemberCollection} from '../api/member';
++ import {getMembersCollection} from '../api/member.api';
 
 export const memberRequestCompleted = (members: MemberEntity[]) => {
     return {
@@ -123,7 +145,7 @@ export const memberRequestCompleted = (members: MemberEntity[]) => {
 }
 
 + export const memberRequest = () => (dispatcher) =>{
-+   const promise = memberAPI.getAllMembers();
++   const promise = getMembersCollection();
 +
 +   promise.then(
 +     (data) => dispatcher(memberRequestCompleted(data))
@@ -138,8 +160,8 @@ export const memberRequestCompleted = (members: MemberEntity[]) => {
 _./src/reducer/member-reducer.ts_
 
 ```typescript
-import { actionsEnums } from "../common/actionsEnums";
-import { MemberEntity } from "../model/member";
+import { actionsIds } from "../common/actionIds";
+import { MemberEntity } from "../model/member.entity";
 
 export type memberState = MemberEntity[];
 
@@ -164,7 +186,7 @@ _./src/reducer/index.js_
 ```diff
 import { combineReducers } from "redux";
 import { userProfileReducer, UserProfileState } from "./user-profile.reducer";
-+ import { memberReducer, memberState } from './memberReducer';
++ import { memberReducer, memberState } from './member-reducer';
 
 export interface State {
   userProfileReducer: UserProfileState;
@@ -181,8 +203,93 @@ export const reducers = combineReducers<State>({
   just display and li (later on we will go porting this to a table),
   and contain a button to trigger a member load.
 
-- Now let's create a container that will tied up component and
-  redux.
+_./src/components/member-collection.component.tsx_
 
-- Excercise port this li list to a table,break it down into table
+```typescript
+import * as React from "react";
+import { MemberEntity } from "./model/member.entity";
+
+interface Props {
+  memberCollection: MemberEntity[];
+  loadMemberCollection: () => void;
+}
+
+export const MemberCollectionComponent = (props: Props) => {
+  const { memberCollection, loadMemberCollection } = props;
+
+  // TODO Excercise port this to a table
+  return (
+    <>
+      <button onClick={loadMemberCollection}>Load</button>
+      <ul>
+        {memberCollection.map(member =>
+          <li>{member.login}</li>
+        }
+      </ul>
+    </>
+  );
+};
+```
+
+- Let's binding it with our reducers and actions
+
+_./src/components/member-collection.container.tsx_
+
+```typescript
+import { connect } from "react-redux";
+import { memberRequest } from "../action";
+import { MemberCollectionComponent } from "./member-collection.component";
+import { State } from "../reducer";
+
+const mapStateToProps = (state: State) => {
+  return {
+    memberCollection: state.memberReducer
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    loadMemberCollection: () => {
+      return dispatch(memberRequest());
+    }
+  };
+};
+
+export const MemberCollectionContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(MemberCollectionComponent);
+```
+
+- Let's use this component in the application.
+
+_./src/index.tsx_
+
+```diff
++ import { MemberCollectionContainer } from "components/member-collection.container";
+// (...)
+
+ReactDOM.render(
+  <Provider store={store}>
+    <>
+      <HelloComponent />
++      <MemberCollectionContainer/>
+    </>
+  </Provider>,
+
+  document.getElementById("root")
+);
+
+```
+
+- Excercise A: port this li list to a table,break it down into table
   and row.
+
+- Excercise B: repeate the same steps but hitting the following
+  rest api:
+
+https://jsonplaceholder.typicode.com/users
+
+And include filter
+
+https://jsonplaceholder.typicode.com/users?name_like=${filter}
