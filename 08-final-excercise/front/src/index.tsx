@@ -1,7 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { HashRouter, Switch, Route } from "react-router-dom";
-import { LoginPage, HotelCollectionPage } from "./scenes";
+import {
+  RegisterCollectionScene,
+  RegisterEntryScene,
+  RegisterExitScene
+} from "./scenes";
 import { routerSwitchRoutes } from "core";
 
 ReactDOM.render(
@@ -9,12 +13,16 @@ ReactDOM.render(
     <Switch>
       <Route
         exact={true}
-        path={routerSwitchRoutes.login}
-        component={LoginPage}
+        path={routerSwitchRoutes.registerCollection}
+        component={RegisterCollectionScene}
       />
       <Route
-        path={routerSwitchRoutes.hotelCollection}
-        component={HotelCollectionPage}
+        path={routerSwitchRoutes.registerEntry}
+        component={RegisterEntryScene}
+      />
+      <Route
+        path={routerSwitchRoutes.registerExit}
+        component={RegisterExitScene}
       />
     </Switch>
   </HashRouter>,

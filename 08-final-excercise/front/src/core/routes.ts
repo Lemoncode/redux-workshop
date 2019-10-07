@@ -3,33 +3,27 @@ import { generatePath } from "react-router";
 type NavigationFunction = (id: string) => string;
 
 interface BaseRoutes {
-  login: string;
-  hotelCollection: string;
-  hotelEdit: string | NavigationFunction;
+  registerCollection: string;
+  registerEntry: string;
+  registerExit: string;
 }
 
-interface AppBaseRoutes extends BaseRoutes {
-  hotelEdit: string;
-}
+interface AppBaseRoutes extends BaseRoutes {}
 
-interface RoutesLinks extends BaseRoutes {
-  hotelEdit: NavigationFunction;
-}
+interface RoutesLinks extends BaseRoutes {}
 
 type RouterSwitchRoutes = AppBaseRoutes;
 
 const appBaseRoutes: AppBaseRoutes = {
-  login: "/",
-  hotelCollection: "/hotel-collection",
-  hotelEdit: "/hotel-edit"
+  registerCollection: "/",
+  registerEntry: "/register-entry",
+  registerExit: "/register-exit"
 };
 
 export const routerSwitchRoutes: RouterSwitchRoutes = {
-  ...appBaseRoutes,
-  hotelEdit: `/${appBaseRoutes.hotelEdit}/:id`
+  ...appBaseRoutes
 };
 
 export const routesLinks: RoutesLinks = {
-  ...appBaseRoutes,
-  hotelEdit: id => generatePath(routerSwitchRoutes.hotelEdit, { id })
+  ...appBaseRoutes
 };

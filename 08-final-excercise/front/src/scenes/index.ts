@@ -1,2 +1,3 @@
-export * from "./login.page";
-export * from "./hotel-collection.page";
+export * from "./register-collection.scene";
+export * from "./register-entry.scene";
+export * from "./register-exit.scene";
