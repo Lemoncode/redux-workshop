@@ -7,7 +7,7 @@ import {
   RegisterCollectionState
 } from "./register-collection.reducer";
 
-interface CoreRootState {
+export interface CoreRootState {
   registerCollectionState: RegisterCollectionState;
 }
 

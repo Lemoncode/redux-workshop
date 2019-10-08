@@ -6,25 +6,29 @@ import {
   RegisterEntryScene,
   RegisterExitScene
 } from "./scenes";
+import { Provider } from "react-redux";
 import { routerSwitchRoutes } from "core";
+import { store } from "./store";
 
 ReactDOM.render(
-  <HashRouter>
-    <Switch>
-      <Route
-        exact={true}
-        path={routerSwitchRoutes.registerCollection}
-        component={RegisterCollectionScene}
-      />
-      <Route
-        path={routerSwitchRoutes.registerEntry}
-        component={RegisterEntryScene}
-      />
-      <Route
-        path={routerSwitchRoutes.registerExit}
-        component={RegisterExitScene}
-      />
-    </Switch>
-  </HashRouter>,
+  <Provider store={store}>
+    <HashRouter>
+      <Switch>
+        <Route
+          exact={true}
+          path={routerSwitchRoutes.registerCollection}
+          component={RegisterCollectionScene}
+        />
+        <Route
+          path={routerSwitchRoutes.registerEntry}
+          component={RegisterEntryScene}
+        />
+        <Route
+          path={routerSwitchRoutes.registerExit}
+          component={RegisterExitScene}
+        />
+      </Switch>
+    </HashRouter>
+  </Provider>,
   document.getElementById("root")
 );

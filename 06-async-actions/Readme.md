@@ -285,7 +285,7 @@ ReactDOM.render(
 - Excercise A: port this li list to a table,break it down into table
   and row.
 
-- Excercise B: repeate the same steps but hitting the following
+- Excercise B: repeat the same steps but hitting the following
   rest api:
 
 https://jsonplaceholder.typicode.com/users
